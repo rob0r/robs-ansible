@@ -1,0 +1,36 @@
+---
+- name: install zsh
+  apt:
+    name: zsh
+    update_cache: yes
+    state: present
+  become: true
+
+- name: check if oh-my-zsh installed
+  stat:
+    path: '{{ ohmyzsh_root }}'
+  register: ohmyzsh
+
+- name: install oh-my-zsh
+  shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" > ~/oh-my-zsh-install.log
+  when: ohmyzsh.stat.exists == False
+
+- name: git clone zsh-syntax-highlighting
+  git:
+    repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
+    dest: "{{ ohmyzsh_root }}/plugins/zsh-syntax-highlighting"
+
+- name: setup .zshrc template
+  template:
+    src: .zshrc.j2
+    dest: ~/.zshrc
+
+- name: determine current shell
+  set_fact:
+    current_shell: "{{ ansible_facts.user_shell }}"
+
+- name: setup zsh as default shell for current user
+  command: usermod --shell /bin/zsh {{ ansible_env.USER }}
+  become: true
+  changed_when: false
+  when: current_shell != "/bin/zsh"

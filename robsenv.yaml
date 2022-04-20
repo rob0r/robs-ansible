@@ -1,0 +1,14 @@
+---
+  - name: robs environment
+    hosts: localhost
+    connection: local
+    
+    pre_tasks:  
+      - name: MOTD
+        debug:
+          msg:
+            - Robs Environment Config
+
+    roles:
+      - zsh
+      - pyenv

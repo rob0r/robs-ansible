@@ -1,0 +1,9 @@
+---
+  - name: robs environment
+    hosts: localhost
+    connection: local
+
+    tasks:
+      - name: show vars
+        debug:
+          msg: "{{ ansible_facts }}"
